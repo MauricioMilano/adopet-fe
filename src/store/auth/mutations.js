@@ -1,3 +1,4 @@
+import Vue from 'vue'
 function parseJwt (token) {
   const base64Url = token.split('.')[1]
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -25,6 +26,8 @@ export const AUTH_PAYLOAD = (state, token) => {
   state.payload = JSON.parse(localStorage.getItem("payload")) || {}
   if(state.payload){
     state.token = state.payload.accessToken
+    // Vue.prototype.$axios.defaults.headers.common.Authorization = `Bearer ${state.token}`
+    
   }
   state.token = ""
 }

@@ -20,6 +20,7 @@ export const AUTH_REQUEST = ({ commit, dispatch }, credential) => {
 }
 
 
+
 export const AUTH_LOGOUT = ({ commit, dispatch }) => {
   return new Promise((resolve, reject) => {
     commit('AUTH_LOGOUT')

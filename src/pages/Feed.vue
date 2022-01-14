@@ -1,16 +1,19 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md">
+    
+
     <q-card
       v-for="pb in publications"
-      :key="pb.id"
-      class="my-card col-md-4 offset-md-4"
+      :key="pb"
+      class="my-card col-md-3 "
       flat
       bordered
     >
-      <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" />
 
+      <q-img height="300px"  :src="`data:image/png;base64,${pb.pets[0].pics}`" />
+  
       <q-card-section>
-        <div class="text-overline text-orange-9">Overline</div>
+        <div class="text-overline text-orange-9">{{pb.address}}</div>
         <div class="text-h5 q-mt-sm q-mb-xs">{{ pb.address }}</div>
         <div class="text-caption text-grey">
           {{ pb.description }}
@@ -23,6 +26,7 @@
           round
           color="dark"
           :icon="pb.liked ? 'favorite' : 'favorite_border'"
+          @click="pb.liked = !pb.liked"
         />
         <q-btn
           flat
@@ -43,10 +47,12 @@
               {{ comment.content }}
             </q-card-section>
           </div>
+           <q-separator />
           <q-input
             type="text"
             v-model="pb.comentario"
             label="Digite um comentário"
+            class="input-comment"
           >
           </q-input>
           <q-btn
@@ -56,9 +62,19 @@
             @click="sendComentario(pb)"
             :icon="'send'"
           />
+          
         </div>
       </q-slide-transition>
     </q-card>
+
+              <q-btn
+            flat
+            round
+            color="dark"
+            class="plus-btn"
+            @click="goToPost"
+            :icon="'add_circle'"
+          />
   </div>
 </template>
 <script>
@@ -68,10 +84,12 @@ export default {
     return {
       name: "",
       password: "",
-      lorem: "aaaaa",
-      publications: [{ comments: [{ id: "" }] }],
+      lorem: "aaaaaaaaaaaa",
+      publications: [{ pets:[{name:"", age:"", pic:""}], comments: [{ id: "" , users:[{username:""}]}] }],
       expanded: true,
-      isLoading: false
+      isLoading: false,
+      slide: 1,
+      fullscreen: false
     };
   },
   beforeCreate() {
@@ -102,8 +120,10 @@ export default {
     // console.log('destroyed')
   },
   methods: {
+    goToPost(){
+      this.$router.push({path: "/post"})
+    },
     async boot() {
-      this.$store.dispatch("AUTH_PAYLOAD")
       const req = await this.$axios.get("/publications", {
         headers: {
           Authorization: `Bearer ${this.$store.getters["auth/getToken"]}`
@@ -129,3 +149,17 @@ export default {
   }
 };
 </script>
+<style scoped>
+.input-comment{
+  width: 80%;
+  display: inline-block;
+  margin: 0px 10px 10px 10px;
+}
+
+.plus-btn{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font: 2em sans-serif;
+}
+</style>

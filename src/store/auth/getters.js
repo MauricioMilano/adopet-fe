@@ -10,11 +10,10 @@ export const getRole = (state) => {
     return null
 }
 export const getToken = (state) => {
-    state.payload = JSON.parse(localStorage.getItem("payload")) || {}
     if(state.payload){
-        state.token = state.payload.accessToken;
-      return state.token
+      return state.payload.accessToken
     }
-    state.token = ""
-    return state.token
+    let hasPayload = JSON.parse(localStorage.getItem("payload")) || {}
+    if(hasPayload) return hasPayload.token
+    return null
 }
