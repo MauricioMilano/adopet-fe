@@ -4,18 +4,16 @@
       <q-card class="my-card col-md-4 offset-md-4 ">
         <q-card-section>
           <q-input v-model="name" label="Nome" :bla="true" />
+          <q-input v-model="email" label="Email" />
           <q-input v-model="password" type="password" label="Senha" />
         </q-card-section>
         <q-card-section>
           <q-btn
             color="primary"
             label="Enviar"
-            @click="login"
+            @click="signup"
             :loading="isLoading"
           />
-        </q-card-section>
-        <q-card-section>
-          <a href="/#/cadastro"> Ou cadastre-se </a>
         </q-card-section>
       </q-card>
     </div>
@@ -24,21 +22,16 @@
 
 <script>
 export default {
-  name: "Login",
+  name: "Cadastro",
   data() {
     return {
       name: "",
       password: "",
+      email: "",
       isLoading: false
     };
   },
   beforeCreate() {
-    const isAuth = this.$store.getters['auth/isAuthenticated']
-    if(isAuth){
-      this.$router.push({ path: "feed" });
-      console.log("está logado")
-      console.log(isAuth)
-    }
     // console.log('beforeCreate')
   },
   created() {
@@ -64,15 +57,26 @@ export default {
     // console.log('destroyed')
   },
   methods: {
-
+    async signup() {
+      this.isLoading = !this.isLoading;
+      await this.$axios.post("/api/auth/signup", {
+        username: this.name,
+        email: this.email,
+        password: this.password,
+        role: ["user"]
+      });
+      this.login();
+      this.isLoading = !this.isLoading;
+    },
     async login() {
       try {
         this.isLoading = !this.isLoading;
+
         await this.$store.dispatch("auth/AUTH_REQUEST", {
           username: this.name,
           password: this.password
         });
-        this.$router.push({ path: "feed" });
+        this.$router.push({ path: "/feed" });
         this.isLoading = !this.isLoading;
       } catch (error) {
         this.isLoading = !this.isLoading;

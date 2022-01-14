@@ -6,10 +6,16 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'login', component: () => import('pages/Login.vue') },
+      { path: 'cadastro', component:()=> import('pages/Cadastro.vue')},
       {
-        path: 'private',
-        component: () => import(/* webpackChunkName: "Private." */ 'pages/Index.vue'),
-        meta: { requiresAuth: true, roles: ['admin', 'cooker'] }
+        path: 'feed',
+        component: () => import(/* webpackChunkName: "Private." */ 'pages/Feed.vue'),
+        meta: { requiresAuth: true, roles: ['admin', 'user'] }
+      },
+      {
+        path: 'post',
+        component: () => import(/* webpackChunkName: "Publicacao." */ 'pages/Publicacao.vue'),
+        meta: { requiresAuth: true, roles: ['admin', 'user'] }
       },
     ]
   },

@@ -7,8 +7,9 @@ function parseJwt (token) {
 }
 
 export const AUTH_SUCCESS = (state, resp) => {
-  state.token = resp.data.token
-  state.payload = parseJwt(resp.data.token)
+  state.token = resp.data.accessToken
+  localStorage.setItem('payload',JSON.stringify(resp.data))
+  state.payload = resp.data
 }
 
 export const AUTH_ERROR = (state) => {
@@ -20,6 +21,10 @@ export const AUTH_LOGOUT = (state) => {
   state.payload = {}
 }
 
-export const AUTH_PAYLOAD = (state, token) => {
-  state.payload = parseJwt(token)
+export const AUTH_PAYLOAD = (state, token) => {  
+  state.payload = JSON.parse(localStorage.getItem("payload")) || {}
+  if(state.payload){
+    state.token = state.payload.accessToken
+  }
+  state.token = ""
 }

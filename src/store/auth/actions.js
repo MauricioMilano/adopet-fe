@@ -2,9 +2,10 @@ import Vue from 'vue'
 
 export const AUTH_REQUEST = ({ commit, dispatch }, credential) => {
   return new Promise((resolve, reject) => {
-    Vue.prototype.$axios.post('/auth/login', credential)
+    Vue.prototype.$axios.post('/api/auth/signin', credential)
       .then(resp => {
-        localStorage.setItem('token', resp.data.token)
+        localStorage.setItem('token', resp.data.token) 
+        console.log(resp.data)
         Vue.prototype.$axios.defaults.headers.common.Authorization = `Bearer ${resp.data.token}`
         commit('AUTH_SUCCESS', resp)
         resolve(resp)
@@ -17,6 +18,7 @@ export const AUTH_REQUEST = ({ commit, dispatch }, credential) => {
       })
   })
 }
+
 
 export const AUTH_LOGOUT = ({ commit, dispatch }) => {
   return new Promise((resolve, reject) => {
