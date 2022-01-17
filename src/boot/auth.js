@@ -9,6 +9,7 @@ export default async ({ app, router, Vue, store }) => {
           next({ path: '/404' })
           return
         }
+        // Vue.prototype.$axios.defaults.headers.common.Authorization = `Bearer ${this.$store.getters["auth/getToken"]}`
         next()
         return
       }
