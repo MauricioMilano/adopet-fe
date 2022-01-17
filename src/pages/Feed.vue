@@ -3,7 +3,7 @@
     <q-card
       v-for="pb in publications"
       :key="pb.id"
-      class="my-card col-md-3 "
+      class="my-card col-md-4 offset-md-4 "
       flat
       bordered
     >
@@ -14,26 +14,71 @@
       />
 
       <q-card-section>
+        <div>
+          <q-btn-dropdown color="primary" push no-caps label="Opções">
+            <q-list>
+              <q-item clickable v-close-popup>
+                <q-item-section avatar>
+                  <q-avatar icon="edit" color="warning" text-color="white" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Editar</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup>
+                <q-item-section avatar>
+                  <q-avatar icon="delete" color="negative" text-color="white" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Excluir</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
         <div class="text-overline text-orange-9">{{ pb.address }}</div>
         <div class="text-h5 q-mt-sm q-mb-xs">{{ pb.address }}</div>
         <div class="text-caption text-grey">
           {{ pb.description }}
         </div>
       </q-card-section>
-
+      <q-card-section>
+        <q-badge
+          outline
+          color="primary"
+          :label="`${pb.qtdLikes} ${pb.qtdLikes > 1 ? 'curtidas' : 'curtida'}`"
+        />
+        <q-badge
+          outline
+          color="dark"
+          :label="
+            `${pb.comments.length} ${
+              pb.comments.length > 1 ? 'comentários' : 'comentário'
+            }`
+          "
+        />
+      </q-card-section>
       <q-card-actions>
-        <q-badge outline color="primary" :label="`${pb.qtdLikes} curtidas`" />
+        <q-btn
+          flat
+          color="primary"
+          label="Enviar mensagem para o dono"
+          icon="chat_bubble"
+        />
+      </q-card-actions>
+      <q-card-actions>
         <q-btn
           flat
           round
-          color="dark"
+          color="primary"
           :icon="pb.liked ? 'favorite' : 'favorite_border'"
           @click="like(pb)"
         />
         <q-btn
           flat
           color="primary"
-          label="Comments"
+          label="Comentarios"
           @click="pb.expanded = !pb.expanded"
         />
 
@@ -55,6 +100,7 @@
             v-model="pb.comentario"
             label="Digite um comentário"
             class="input-comment"
+            v-on:keyup.enter="sendComentario(pb)"
           >
           </q-input>
           <q-btn
@@ -73,7 +119,7 @@
       round
       color="dark"
       class="plus-btn"
-      @click="goToPost"
+      @click="$router.push({ path: '/post' })"
       :icon="'add_circle'"
     />
   </div>
@@ -86,15 +132,17 @@ export default {
       name: "",
       password: "",
       lorem: "aaaaaaaaaaaa",
+      userLoggedId: this.$store.getters["auth/getUserId"],
+      userLogged: this.$store.getters["auth/getUser"],
       publications: [
         {
-          id:1,
+          id: 1,
           liked: false,
-          expanded:false,
-          qtdLikes:1,
+          expanded: false,
+          qtdLikes: 1,
           pets: [{ name: "", age: "" }],
-          comments: [{ id: "", user: { username: "mario" }, content:"something  " }],
-          user: { name: "" }
+          comments: [{ id: "", user: { username: "" }, content: "" }],
+          user: { id: "", name: "" }
         }
       ],
       expanded: true,
@@ -107,7 +155,7 @@ export default {
     // console.log('beforeCreate')
   },
   async created() {
-        await this.boot();
+    await this.boot();
 
     // console.log('created')
     // console.log(this.$moment().format('MMMM Do YYYY, h:mm:ss a'))
@@ -115,7 +163,7 @@ export default {
   beforeMount() {
     // console.log('beforeMount')
   },
-   mounted() {
+  mounted() {
     // this.publications.forEach(this.publications =)
     // console.log('mounted')
   },
@@ -132,9 +180,7 @@ export default {
     // console.log('destroyed')
   },
   methods: {
-    goToPost() {
-      this.$router.push({ path: "/post" });
-    },
+
     async like(publication) {
       const req = await this.$axios.post(`like/${publication.id}`, {});
       publication.liked = req.data.youLiked ? req.data.youLiked : false;
@@ -145,13 +191,13 @@ export default {
     async boot() {
       this.$axios.defaults.headers.common.Authorization = `Bearer ${this.$store.getters["auth/getToken"]}`;
       const req = await this.$axios.get("/publications");
-      this.publications = []
+      this.publications = [];
       req.data.forEach(async elem => {
         elem.expanded = false;
-        const like = await this.$axios.get(`/like/${elem.id}`)
+        const like = await this.$axios.get(`/like/${elem.id}`);
         elem.liked = like.data.youLiked ? like.data.youLiked : false;
         elem.qtdLikes = like.data.qtdLikes;
-        this.publications.push(elem)
+        this.publications.push(elem);
         return elem;
       });
     },
@@ -165,7 +211,13 @@ export default {
           }
         }
       );
-      this.boot();
+      let comment = {
+        id: "",
+        user: { username: this.userLogged },
+        content: pb.comentario
+      };
+      pb.comments.push(comment);
+      pb.comentario = "";
     }
   }
 };

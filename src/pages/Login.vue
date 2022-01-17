@@ -3,8 +3,8 @@
     <div class="row ">
       <q-card class="my-card col-md-4 offset-md-4 ">
         <q-card-section>
-          <q-input v-model="name" label="Nome" :bla="true" />
-          <q-input v-model="password" type="password" label="Senha" />
+          <q-input v-model="name" label="Nome" :bla="true" v-on:keyup.enter="login" />
+          <q-input v-model="password" type="password" label="Senha" v-on:keyup.enter="login" />
         </q-card-section>
         <q-card-section>
           <q-btn

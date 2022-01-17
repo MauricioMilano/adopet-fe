@@ -17,3 +17,19 @@ export const getToken = (state) => {
     if(hasPayload) return hasPayload.token
     return null
 }
+export const getUser = (state) => {
+    if(state.payload){
+        return state.payload.username
+      }
+      let hasPayload = JSON.parse(localStorage.getItem("payload")) || {}
+      if(hasPayload) return hasPayload.username
+      return null
+}
+export const getUserId = (state) => {
+    if(state.payload){
+        return state.payload.id
+      }
+      let hasPayload = JSON.parse(localStorage.getItem("payload")) || {}
+      if(hasPayload) return hasPayload.id
+      return null
+}

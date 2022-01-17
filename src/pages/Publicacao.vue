@@ -12,7 +12,13 @@
               accept="image/jpeg"
               @change="uploadImage($event,pet)"
             ></q-input>
+                     <q-btn
+            color="primary"
+            icon="close"
+            @click="removerPet(pet)"
+          />
           </div>
+ 
           <q-btn
             color="primary"
             label="Adicionar mais um pet"
@@ -55,37 +61,6 @@ export default {
       isLoading: false
     };
   },
-  beforeCreate() {
-    // const isAuth = this.$store.getters['auth/isAuthenticated']
-    // if(isAuth){
-    //   this.$router.push({ path: "feed" });
-    //   console.log("está logado")
-    //   console.log(isAuth)
-    // }
-    // console.log('beforeCreate')
-  },
-  created() {
-    // console.log('created')
-    // console.log(this.$moment().format('MMMM Do YYYY, h:mm:ss a'))
-  },
-  beforeMount() {
-    // console.log('beforeMount')
-  },
-  mounted() {
-    // console.log('mounted')
-  },
-  beforeUpdate() {
-    // console.log('beforeUpdate')
-  },
-  updated() {
-    // console.log('updated')
-  },
-  beforeDestroy() {
-    // console.log('beforeDestroy')
-  },
-  destroyed() {
-    // console.log('destroyed')
-  },
   methods: {
     async publicar() {
        const req = await this.$axios.post(
@@ -120,6 +95,10 @@ export default {
         pet.pics=this.previewImage
         console.log(this.previewImage);
       };
+    },
+    removerPet (pet){
+      let idx = this.pets.indexOf(pet)
+      if (idx > -1) this.pets.shift(pet)
     }
   }
 };
