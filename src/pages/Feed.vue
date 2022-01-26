@@ -1,119 +1,157 @@
 <template>
   <div class="q-pa-md row items-start q-gutter-md">
-    <q-card
-      v-for="pb in publications"
-      :key="pb.id"
-      class="my-card col-md-4 offset-md-4 "
-      flat
-      bordered
-    >
-      <q-img
-        height="300px"
-        v-if="pb.pets[0].pics"
-        :src="`data:image/png;base64,${pb.pets[0].pics}`"
-      />
 
-      <q-card-section>
-        <div>
-          <q-btn-dropdown color="primary" push no-caps label="Opções">
-            <q-list>
-              <q-item clickable v-close-popup>
-                <q-item-section avatar>
-                  <q-avatar icon="edit" color="warning" text-color="white" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Editar</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup>
-                <q-item-section avatar>
-                  <q-avatar icon="delete" color="negative" text-color="white" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Excluir</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        </div>
-        <div class="text-overline text-orange-9">{{ pb.address }}</div>
-        <div class="text-h5 q-mt-sm q-mb-xs">{{ pb.address }}</div>
-        <div class="text-caption text-grey">
-          {{ pb.description }}
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <q-badge
-          outline
-          color="primary"
-          :label="`${pb.qtdLikes} ${pb.qtdLikes > 1 ? 'curtidas' : 'curtida'}`"
-        />
-        <q-badge
-          outline
-          color="dark"
-          :label="
-            `${pb.comments.length} ${
-              pb.comments.length > 1 ? 'comentários' : 'comentário'
-            }`
-          "
-        />
-      </q-card-section>
-      <q-card-actions>
-        <q-btn
-          flat
-          color="primary"
-          label="Enviar mensagem para o dono"
-          icon="chat_bubble"
-        />
-      </q-card-actions>
-      <q-card-actions>
-        <q-btn
-          flat
-          round
-          color="primary"
-          :icon="pb.liked ? 'favorite' : 'favorite_border'"
-          @click="like(pb)"
-        />
-        <q-btn
-          flat
-          color="primary"
-          label="Comentarios"
-          @click="pb.expanded = !pb.expanded"
-        />
-
-        <q-space />
-      </q-card-actions>
-
-      <q-slide-transition>
-        <div v-show="pb.expanded">
-          <div v-for="comment in pb.comments" :key="comment.id">
-            <q-separator />
-            <q-card-section class="text-subitle2">
-              <b>{{ comment.user.username }}: </b>
-              {{ comment.content }}
-            </q-card-section>
-          </div>
-          <q-separator />
-          <q-input
-            type="text"
-            v-model="pb.comentario"
-            label="Digite um comentário"
-            class="input-comment"
-            v-on:keyup.enter="sendComentario(pb)"
+      <q-card
+        v-for="pb in publications"
+        :key="pb.id"
+        class="my-card col-md-4 offset-md-1 "
+        flat
+        bordered
+      >
+        <q-carousel
+          v-model="pb.slide"
+          transition-prev="slide-right"
+          transition-next="slide-left"
+          swipeable
+          animated
+          control-color="primary"
+          infinite
+          navigation
+          padding
+          arrows
+          height="500px"
+          class="bg-grey-1 shadow-2 rounded-borders"
+        >
+          <q-carousel-slide
+            v-for="pet in pb.pets"
+            :key="pet.id"
+            :name="pb.pets.indexOf(pet)"
+            class="column no-wrap"
           >
-          </q-input>
+            <!-- <div class="row fit justify-start items-center  no-wrap"> -->
+            <q-img
+              height="300px"
+              v-if="pet.pics"
+              :src="`data:image/png;base64,${pet.pics}`"
+            />
+            <div class="text-h5 q-mt-sm q-mb-xs">{{ pet.name }}</div>
+            <div class="text-caption text-grey">
+              {{ pet.age }}
+            </div>
+            <!-- </div> -->
+          </q-carousel-slide>
+        </q-carousel>
+        <q-separator />
+        <q-card-section>
+          <div v-if="canEdit(pb)">
+            <q-btn-dropdown color="primary" push no-caps label="Opções">
+              <q-list>
+                <q-item clickable v-close-popup>
+                  <q-item-section avatar>
+                    <q-avatar icon="edit" color="warning" text-color="white" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Editar</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="excluir(pb)">
+                  <q-item-section avatar>
+                    <q-avatar
+                      icon="delete"
+                      color="negative"
+                      text-color="white"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Excluir</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </div>
+          <div class="text-overline text-orange-9">{{ pb.zipcode }}</div>
+          <div class="text-h5 q-mt-sm q-mb-xs">{{ pb.address }}</div>
+          <div class="text-caption text-grey">
+            {{ pb.description }}
+          </div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <q-badge
+            outline
+            color="primary"
+            :label="
+              `${pb.qtdLikes} ${pb.qtdLikes > 1 ? 'curtidas' : 'curtida'}`
+            "
+          />
+          <q-badge
+            outline
+            color="dark"
+            :label="
+              `${pb.comments.length} ${
+                pb.comments.length > 1 ? 'comentários' : 'comentário'
+              }`
+            "
+          />
+        </q-card-section>
+        <q-separator />
+        <q-card-actions v-if="!canEdit(pb)">
+          <q-btn
+            flat
+            color="primary"
+            label="Enviar mensagem para o dono"
+            icon="chat_bubble"
+          />
+        </q-card-actions>
+        <q-separator />
+        <q-card-actions>
           <q-btn
             flat
             round
-            color="dark"
-            @click="sendComentario(pb)"
-            :icon="'send'"
+            color="primary"
+            :icon="pb.liked ? 'favorite' : 'favorite_border'"
+            @click="like(pb)"
           />
-        </div>
-      </q-slide-transition>
-    </q-card>
+          <q-separator vertical />
+          <q-btn
+            flat
+            color="primary"
+            label="Comentarios"
+            @click="pb.expanded = !pb.expanded"
+          />
 
+          <q-space />
+        </q-card-actions>
+
+        <q-slide-transition>
+          <div v-show="pb.expanded">
+            <div v-for="comment in pb.comments" :key="comment.id">
+              <q-separator />
+              <q-card-section class="text-subitle2">
+                <b>{{ comment.user.username }}: </b>
+                {{ comment.content }}
+              </q-card-section>
+            </div>
+            <q-separator />
+            <q-input
+              type="text"
+              v-model="pb.comentario"
+              label="Digite um comentário"
+              class="input-comment"
+              v-on:keyup.enter="sendComentario(pb)"
+            >
+            </q-input>
+            <q-btn
+              flat
+              round
+              color="dark"
+              @click="sendComentario(pb)"
+              :icon="'send'"
+            />
+          </div>
+        </q-slide-transition>
+      </q-card>
     <q-btn
       flat
       round
@@ -138,6 +176,7 @@ export default {
         {
           id: 1,
           liked: false,
+          slide: 0,
           expanded: false,
           qtdLikes: 1,
           pets: [{ name: "", age: "" }],
@@ -180,7 +219,6 @@ export default {
     // console.log('destroyed')
   },
   methods: {
-
     async like(publication) {
       const req = await this.$axios.post(`like/${publication.id}`, {});
       publication.liked = req.data.youLiked ? req.data.youLiked : false;
@@ -194,6 +232,7 @@ export default {
       this.publications = [];
       req.data.forEach(async elem => {
         elem.expanded = false;
+        elem.slide = 0;
         const like = await this.$axios.get(`/like/${elem.id}`);
         elem.liked = like.data.youLiked ? like.data.youLiked : false;
         elem.qtdLikes = like.data.qtdLikes;
@@ -218,6 +257,13 @@ export default {
       };
       pb.comments.push(comment);
       pb.comentario = "";
+    },
+    canEdit(pb) {
+      return pb.user.id === this.userLoggedId;
+    },
+    async excluir(pb) {
+      await this.$axios.delete(`/publications/${pb.id}`);
+      this.boot();
     }
   }
 };
@@ -233,6 +279,6 @@ export default {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  font: 2em sans-serif;
+  font: 4em sans-serif;
 }
 </style>
