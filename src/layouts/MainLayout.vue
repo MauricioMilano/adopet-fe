@@ -153,22 +153,22 @@
       <router-view />
     </q-page-container>
     <q-card class="chat">
-      <q-scroll-area style="height: 430px; max-width: 350px;">
-        <div v-for="n in 100" :key="n" class="q-py-xs">
-          <q-chat-message :text="['hey, how are you?']" sent />
-          <q-chat-message :text="['doing fine, how r you?']" />
+      <q-scroll-area ref="scroll" id="scroll-area" style="height: 430px; max-width: 350px;">
+        <div v-for="m in mensagens" :key="m.id" class="q-py-xs">
+          <q-chat-message :name="m.me ? 'Eu' : m.userName" avatar="https://cdn.quasar.dev/img/avatar1.jpg" :text="[m.content]" :sent="m.me" />
         </div>
       </q-scroll-area>
       <q-input
         class="input-chat"
         v-model="mensagem"
         label="Escreva sua mensagem"
+              v-on:keyup.enter="sendMessage"
       />
       <q-btn
         flat
         round
         color="dark"
-        @click="sendComentario(pb)"
+              @click="sendMessage"
         :icon="'send'"
       />
     </q-card>
@@ -183,10 +183,66 @@ export default {
     return {
       leftDrawerOpen: false,
       rightDrawerOpen: false,
-      mensagem: ""
+      mensagem: "",
+      mensagens: [{
+        id: 1,
+        me: false,
+        userName: 'Samantha',
+        content: 'oiii',
+        date: new Date(),
+      },
+      {
+        id: 2,
+        me: false,
+        userName: 'Samantha',
+        content: 'tudo bom?',
+        date: new Date(),
+      },{
+        id: 3,
+        me: true,
+        userName: 'Samantha',
+        content: 'oie',
+        date: new Date(),
+      },{
+        id: 4,
+        me: true,
+        userName: 'Samantha',
+        content: 'tudo',
+        date: new Date(),
+      },{
+        id: 5,
+        me: true,
+        userName: 'Samantha',
+        content: 'e',
+        date: new Date(),
+      },{
+        id: 6,
+        me: true,
+        userName: 'Samantha',
+        content: 'contigo',
+        date: new Date(),
+      },{
+        id: 7,
+        me: true,
+        userName: 'Samantha',
+        content: '?',
+        date: new Date(),
+      },{
+        id: 8,
+        me: false,
+        userName: 'Samantha',
+        content: 'tbm',
+        date: new Date(),
+      },
+
+      ]
+
     };
   },
   methods: {
+      mounted() {
+        this.goToBottom(this.$refs.scroll, 3000)
+  },
     onLeft({ reset }) {
       // this.$q.notify('Left action triggered. Resetting in 1 second.')
       this.finalize(reset);
@@ -201,6 +257,26 @@ export default {
       this.timer = setTimeout(() => {
         reset();
       }, 1000);
+    },
+    sendMessage() { 
+      let ultimoId = this.mensagens[this.mensagens.length - 1].id + 1;
+      let novaMensagem = {
+        id: ultimoId,
+        me: true,
+        userName: 'Samantha',
+        content: this.mensagem,
+        date: new Date()
+      };
+
+      this.mensagem = "";
+      this.mensagens.push(novaMensagem);
+      this.goToBottom(this.$refs.scroll)
+    },
+    goToBottom(component, delay = 100){
+      setTimeout(()=>{
+        let size = component.scrollSize
+        component.setScrollPosition( size+300 )
+      }, delay)
     }
   },
   computed: {
