@@ -6,7 +6,17 @@
           <q-input v-model="name" label="Nome" :bla="true" />
           <q-input v-model="email" label="Email" />
           <q-input v-model="password" type="password" label="Senha" />
+          <q-input
+              type="file"
+              accept="image/jpeg"
+              @change="uploadImage($event)"
+            ></q-input>
         </q-card-section>
+        <q-img
+        height="300px"
+        v-if="previewImage"
+        :src="`${previewImage}`"
+      />
         <q-card-section>
           <q-btn
             color="primary"
@@ -27,6 +37,7 @@ export default {
     return {
       name: "",
       password: "",
+      previewImage: "",
       email: "",
       isLoading: false
     };
@@ -63,6 +74,7 @@ export default {
         username: this.name,
         email: this.email,
         password: this.password,
+        picture: this.previewImage,
         role: ["user"]
       });
       this.login();
@@ -81,7 +93,16 @@ export default {
       } catch (error) {
         this.isLoading = !this.isLoading;
       }
-    }
-  }
+    },
+     uploadImage(e) {
+      const image = e.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = e => {
+        this.previewImage = e.target.result;
+      };
+    },
+  },
+ 
 };
 </script>

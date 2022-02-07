@@ -5,9 +5,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Index.vue') },
+      { path: 'messages', component: ()=> import('pages/Messages.vue')},
       { path: 'login', component: () => import('pages/Login.vue') },
       { path: 'logout', component: () => import('pages/Logout.vue') },
       { path: 'cadastro', component:()=> import('pages/Cadastro.vue')},
+      { path: 'perfil', component:()=> import('pages/Perfil.vue')},
       {
         path: 'feed',
         component: () => import(/* webpackChunkName: "Private." */ 'pages/Feed.vue'),

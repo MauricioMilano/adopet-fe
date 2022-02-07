@@ -14,6 +14,7 @@
         <q-toolbar-title>
           Adopet
         </q-toolbar-title>
+     
         <q-btn
           v-if="isAuth"
           dense
@@ -45,6 +46,29 @@
           <q-item-section>
             <q-item-label>Feed</q-item-label>
             <q-item-label caption>Feed de pets</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          v-if="isAuth"
+          clickable
+          v-ripple
+          @click="$router.push({ path: '/perfil' })"
+        >
+          <q-item-section>
+            <q-item-label>Perfil</q-item-label>
+            <q-item-label caption>Perfil do usuário</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          v-if="isAuth"
+          clickable
+          v-ripple
+          @click="$router.push({ path: '/messages' })"
+        >
+          <q-item-section>
+            <q-item-label>Minhas mensagens</q-item-label>
+            <q-item-label caption>Veja suas mensagens aqui</q-item-label>
           </q-item-section>
         </q-item>
         <q-item
@@ -79,80 +103,10 @@
         </q-item>
       </q-list>
     </q-drawer>
-
-    <q-drawer
-      v-if="isAuth"
-      show-if-above
-      v-model="rightDrawerOpen"
-      side="right"
-      bordered
-    >
-      <q-list bordered separator>
-        <q-slide-item @left="onLeft" @right="onRight">
-          <template v-slot:left>
-            <q-icon name="done" />
-          </template>
-          <template v-slot:right>
-            <q-icon name="alarm" />
-          </template>
-
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar color="primary" text-color="white" icon="bluetooth" />
-            </q-item-section>
-            <q-item-section>Icons only</q-item-section>
-          </q-item>
-        </q-slide-item>
-
-        <q-slide-item @left="onLeft" @right="onRight">
-          <template v-slot:left>
-            Left
-          </template>
-          <template v-slot:right>
-            Right content.. long
-          </template>
-
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar>
-                <img
-                  src="https://cdn.quasar.dev/img/avatar6.jpg"
-                  draggable="false"
-                />
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>Text only</q-item-section>
-          </q-item>
-        </q-slide-item>
-
-        <q-slide-item @left="onLeft" @right="onRight">
-          <template v-slot:left>
-            <div class="row items-center"><q-icon left name="done" /> Left</div>
-          </template>
-          <template v-slot:right>
-            <div class="row items-center">
-              Right content.. long <q-icon right name="alarm" />
-            </div>
-          </template>
-
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar>
-                <img
-                  src="https://cdn.quasar.dev/img/avatar4.jpg"
-                  draggable="false"
-                />
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>Text and icons</q-item-section>
-          </q-item>
-        </q-slide-item>
-      </q-list>
-    </q-drawer>
     <q-page-container>
       <router-view />
     </q-page-container>
-    <q-card class="chat">
+    <!-- <q-card class="chat">
       <q-scroll-area ref="scroll" id="scroll-area" style="height: 430px; max-width: 350px;">
         <div v-for="m in mensagens" :key="m.id" class="q-py-xs">
           <q-chat-message :name="m.me ? 'Eu' : m.userName" avatar="https://cdn.quasar.dev/img/avatar1.jpg" :text="[m.content]" :sent="m.me" />
@@ -171,7 +125,7 @@
               @click="sendMessage"
         :icon="'send'"
       />
-    </q-card>
+    </q-card> -->
   </q-layout>
 </template>
 
@@ -235,13 +189,17 @@ export default {
         date: new Date(),
       },
 
-      ]
-
+      ],
+      username:'',
+      role:[],
+      picture:'',
+      email:''
     };
   },
   methods: {
       mounted() {
         this.goToBottom(this.$refs.scroll, 3000)
+        this.getProfile()
   },
     onLeft({ reset }) {
       // this.$q.notify('Left action triggered. Resetting in 1 second.')
@@ -271,6 +229,13 @@ export default {
       this.mensagem = "";
       this.mensagens.push(novaMensagem);
       this.goToBottom(this.$refs.scroll)
+    },
+    async getProfile(){
+       const req = await this.$axios.get("/profile");
+      this.username = req.data.username
+      this.role = req.data.roles
+      this.email = req.data.email
+      this.picture = req.data.picture
     },
     goToBottom(component, delay = 100){
       setTimeout(()=>{
